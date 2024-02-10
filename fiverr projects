@@ -1,0 +1,25 @@
+Sub endtime()
+
+Dim currenttime As String
+
+currenttime = Now()
+
+ActiveSheet.Range("A2").Value = currenttime
+
+ActiveSheet.Range("A3").Value = Format(ActiveSheet.Range("A2").Value - ActiveSheet.Range("A1").Value, "hh:mm:ss")
+
+
+
+End Sub
+
+_________________________________________________________________________________________________
+Sub starttime()
+
+Dim currenttime As String
+
+currenttime = Now()
+
+ActiveSheet.Range("A1").Value = currenttime
+
+End Sub
+
