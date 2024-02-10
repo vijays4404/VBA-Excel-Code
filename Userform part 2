@@ -1,0 +1,274 @@
+Option Explicit
+
+
+Sub Reset()
+    Dim lastrow As Long
+    Dim ws As Worksheet
+    Set ws = ThisWorkbook.Sheets("DataBase")
+    lastrow = ws.Range("A" & Rows.Count).End(xlUp).Row
+    
+    With Form
+        .txtunitsold.Value = ""
+        .txtmanufacture.Value = ""
+        .txtsaleprice.Value = ""
+        .txtgrosssale.Value = ""
+        .txtdiscount.Value = ""
+        .txtsales.Value = ""
+        .txtcogs.Value = ""
+        .txtprofit.Value = ""
+        .txtdate.Value = ""
+        
+        
+        .cbsegment.Clear
+        .cbsegment.AddItem "Government"
+        .cbsegment.AddItem "Midmarket"
+        .cbsegment.AddItem "Channel Partners"
+        .cbsegment.AddItem "Enterprise"
+        .cbsegment.AddItem "Small Business"
+        .cbsegmentsearch.Clear
+        .cbsegmentsearch.AddItem "Government"
+        .cbsegmentsearch.AddItem "Midmarket"
+        .cbsegmentsearch.AddItem "Channel Partners"
+        .cbsegmentsearch.AddItem "Enterprise"
+        .cbsegmentsearch.AddItem "Small Business"
+        
+        .cbdiscount.Clear
+        .cbdiscount.AddItem "None"
+        .cbdiscount.AddItem "Low"
+        .cbdiscount.AddItem "Medium"
+        .cbdiscount.AddItem "High"
+        
+
+        
+        .cbcountry.Clear
+        .cbcountry.AddItem "Canada"
+        .cbcountry.AddItem "Germany"
+        .cbcountry.AddItem "France"
+        .cbcountry.AddItem "Mexico"
+        .cbcountry.AddItem "United States of America"
+        
+        .cbcountrysearch.Clear
+        .cbcountrysearch.AddItem "Canada"
+        .cbcountrysearch.AddItem "Germany"
+        .cbcountrysearch.AddItem "France"
+        .cbcountrysearch.AddItem "Mexico"
+        .cbcountrysearch.AddItem "United States of America"
+        
+        
+        
+        
+        
+        
+        .cbproduct.Clear
+        .cbproduct.AddItem "Carretera"
+        .cbproduct.AddItem "Montana"
+        .cbproduct.AddItem "Paseo"
+        .cbproduct.AddItem "Velo"
+        .cbproduct.AddItem "VTT"
+        .cbproduct.AddItem "Amarilla"
+        
+        .cbproducesearch.Clear
+        .cbproducesearch.AddItem "Carretera"
+        .cbproducesearch.AddItem "Montana"
+        .cbproducesearch.AddItem "Paseo"
+        .cbproducesearch.AddItem "Velo"
+        .cbproducesearch.AddItem "VTT"
+        .cbproducesearch.AddItem "Amarilla"
+        
+        
+        .lstdatabase.ColumnCount = 17
+        .lstdatabase.ColumnHeads = True
+        .lstdatabase.ColumnWidths = "40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40"
+        If lastrow > 1 Then
+            .lstdatabase.RowSource = "Database!A2:Q" & lastrow
+        Else
+            .lstdatabase.RowSource = "Database!A2:Q2"
+        End If
+        
+        'Below code are associated with search
+        Call Add_SearchColumn
+        ThisWorkbook.Sheets("Database").AutoFilterMode = False
+        ThisWorkbook.Sheets("Searchdata").AutoFilterMode = False
+        ThisWorkbook.Sheets("Searchdata").Cells.Clear
+        
+    
+    
+    
+    End With
+    
+
+End Sub
+
+
+
+Sub Submit()
+    Dim ws As Worksheet
+    Dim LastEmptyRow As Long
+    
+    Set ws = ThisWorkbook.Sheets("Database")
+    If Form.txtsno.Value = "" Then
+        LastEmptyRow = ws.Range("A" & Rows.Count).End(xlUp).Row + 1
+    Else
+        LastEmptyRow = Form.txtsno.Value
+    End If
+
+    
+    With ws
+        ws.Range("A" & LastEmptyRow).Value = LastEmptyRow - 1
+        ws.Range("B" & LastEmptyRow).Value = Form.cbsegment.Value
+        ws.Range("C" & LastEmptyRow).Value = Form.cbcountry.Value
+        ws.Range("D" & LastEmptyRow).Value = Form.cbproduct.Value
+        ws.Range("E" & LastEmptyRow).Value = Form.cbdiscount.Value
+        ws.Range("F" & LastEmptyRow).Value = Form.txtunitsold.Value
+        ws.Range("G" & LastEmptyRow).Value = Form.txtmanufacture.Value
+        ws.Range("H" & LastEmptyRow).Value = Form.txtsaleprice.Value
+        ws.Range("I" & LastEmptyRow).Value = Form.txtgrosssale.Value
+        ws.Range("J" & LastEmptyRow).Value = Form.txtdiscount.Value
+        ws.Range("K" & LastEmptyRow).Value = Form.txtsales.Value
+        ws.Range("L" & LastEmptyRow).Value = Form.txtcogs.Value
+        ws.Range("M" & LastEmptyRow).Value = Form.txtprofit.Value
+        ws.Range("N" & LastEmptyRow).Value = Form.txtdate.Value
+        ws.Range("O" & LastEmptyRow).Value = VBA.Day(Form.txtdate.Value)
+        ws.Range("P" & LastEmptyRow).Value = VBA.Format(Form.txtdate.Value, "mmmm")
+        ws.Range("Q" & LastEmptyRow).Value = VBA.Year(Form.txtdate.Value)
+        
+    End With
+    
+End Sub
+
+
+
+Sub Show_Form()
+    Form.Show
+    
+End Sub
+
+Function Selected_List() As Long
+    Dim i As Long
+    Selected_List = 0
+    For i = 0 To Form.lstdatabase.ListCount - 1
+        If Form.lstdatabase.Selected(i) = True Then
+            Selected_List = i + 1
+            Exit For
+        End If
+    Next i
+    
+End Function
+
+
+Sub Add_SearchColumn()
+
+    Form.EnableEvents = False
+    
+End Sub
+
+
+
+Sub SearchData()
+    Application.ScreenUpdating = False
+    Dim shDatabase As Worksheet
+    Dim shSearchData As Worksheet
+    Dim Databaserow As Long
+    Dim SearchRow As Long
+    Dim countryColumn As String
+    Dim segmentColumn As String
+    Dim productColumn As String
+    Dim dateColumn As String
+    
+    
+    
+    Set shDatabase = ThisWorkbook.Sheets("Database")
+    Set shSearchData = ThisWorkbook.Sheets("SearchData")
+    Databaserow = shDatabase.Range("A" & Rows.Count).End(xlUp).Row
+
+    Debug.Print Databaserow
+    segmentColumn = Form.cbsegmentsearch.Value
+    countryColumn = Form.cbcountrysearch.Value
+    productColumn = Form.cbproducesearch.Value
+    dateColumn = Form.txtdatesearch.Value
+    
+    
+    
+    
+    
+    'Remove filter from Database worksheet
+    If shDatabase.FilterMode Then
+        shDatabase.ShowAllData
+    End If
+    
+    If shDatabase.AutoFilterMode Then
+        shDatabase.AutoFilterMode = False
+    End If
+    
+    'Apply filter on Datbase worksheet
+    If segmentColumn = "" And countryColumn = "" And productColumn = "" And dateColumn = "" Then
+        Exit Sub
+        
+    ElseIf segmentColumn <> "" And countryColumn = "" And productColumn = "" Then
+        shDatabase.Range("A1:Q" & Databaserow).AutoFilter field:=2, Criteria1:=segmentColumn
+        
+    ElseIf segmentColumn <> "" And countryColumn <> "" And productColumn = "" Then
+        shDatabase.Range("A1:Q" & Databaserow).AutoFilter field:=2, Criteria1:=segmentColumn
+        shDatabase.Range("A1:Q" & Databaserow).AutoFilter field:=3, Criteria1:=countryColumn
+        
+        
+    ElseIf segmentColumn <> "" And countryColumn <> "" And productColumn <> "" And dateColumn <> "" Then
+        shDatabase.Range("A1:Q" & Databaserow).AutoFilter field:=2, Criteria1:=segmentColumn
+        shDatabase.Range("A1:Q" & Databaserow).AutoFilter field:=3, Criteria1:=countryColumn
+        shDatabase.Range("A1:Q" & Databaserow).AutoFilter field:=14, Criteria1:=dateColumn
+        shDatabase.Range("A1:Q" & Databaserow).AutoFilter field:=4, Criteria1:=productColumn
+        
+        
+        
+        
+    ElseIf segmentColumn <> "" And countryColumn <> "" And productColumn <> "" Then
+        shDatabase.Range("A1:Q" & Databaserow).AutoFilter field:=2, Criteria1:=segmentColumn
+        shDatabase.Range("A1:Q" & Databaserow).AutoFilter field:=3, Criteria1:=countryColumn
+        shDatabase.Range("A1:Q" & Databaserow).AutoFilter field:=4, Criteria1:=productColumn
+
+
+    ElseIf segmentColumn = "" And countryColumn <> "" And productColumn <> "" Then
+        
+        shDatabase.Range("A1:Q" & Databaserow).AutoFilter field:=3, Criteria1:=countryColumn
+        shDatabase.Range("A1:Q" & Databaserow).AutoFilter field:=4, Criteria1:=productColumn
+    ElseIf segmentColumn = "" And countryColumn = "" And productColumn <> "" Then
+        
+        shDatabase.Range("A1:Q" & Databaserow).AutoFilter field:=4, Criteria1:=productColumn
+        
+    ElseIf segmentColumn <> "" And countryColumn = "" And productColumn <> "" Then
+        shDatabase.Range("A1:Q" & Databaserow).AutoFilter field:=2, Criteria1:=segmentColumn
+        shDatabase.Range("A1:Q" & Databaserow).AutoFilter field:=4, Criteria1:=productColumn
+    End If
+    
+    If Application.WorksheetFunction.Subtotal(3, shDatabase.Range("A:A")) >= 2 Then
+        shSearchData.Cells.Clear
+        shDatabase.UsedRange.Copy shSearchData.Range("A1")
+        Application.CutCopyMode = False
+        SearchRow = shSearchData.Range("A" & Rows.Count).End(xlUp).Row
+        Form.lstdatabase.ColumnWidths = "40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40"
+    End If
+    If SearchRow > 1 Then
+        Form.lstdatabase.RowSource = "SearchData!A2:Q" & SearchRow
+        MsgBox "Records found."
+    
+    
+        
+    
+    Else
+        MsgBox "No record found."
+    
+    
+    End If
+    If shDatabase.FilterMode Then
+        shDatabase.ShowAllData
+    End If
+    
+    If shDatabase.AutoFilterMode Then
+        shDatabase.AutoFilterMode = False
+    End If
+    
+        
+    Application.ScreenUpdating = True
+   
+    
+End Sub
