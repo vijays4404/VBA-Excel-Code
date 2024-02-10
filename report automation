@@ -1,0 +1,64 @@
+
+Sub processing()
+Dim dataws As Worksheet
+Dim processedws As Worksheet
+Dim finalws As Worksheet
+Dim i As Long
+
+
+Dim lastrow As Long
+Dim lastrowprocessed As Long
+
+Dim fpath As String
+Set processedws = ThisWorkbook.Worksheets("processed")
+Set finalws = ThisWorkbook.Worksheets("Feuil1")
+
+
+
+
+'ThisWorkbook.Path & "\" & "Letters" & "\" & "Contract Extension"
+'shDatabase.Range("A1:Q" & Databaserow).AutoFilter field:=4, Criteria1:=productColumn
+        
+    'ElseIf segmentColumn <> "" And countryColumn = "" And productColumn <> "" Then
+        'shDatabase.Range("A1:Q" & Databaserow).AutoFilter field:=2, Criteria1:=segmentColumn
+        'shDatabase.Range("A1:Q" & Databaserow).AutoFilter field:=4, Criteria1:=productColumn
+
+'Workbooks.Open Filename:="C:\New folder\Excel Sheet\notebooks\excel2.xlsx"
+'sales.UsedRange.Copy Destination:=usd.Range("A1")
+fpath = ThisWorkbook.Path & "\" & "FileAyyyymmdd.xlsx"
+
+Debug.Print fpath
+
+Workbooks.Open Filename:=fpath
+
+Set dataws = ActiveWorkbook.Worksheets("Feuil1")
+
+dataws.Activate
+lastrow = dataws.Range("A" & Rows.Count).End(xlUp).Row
+Debug.Print lastrow
+
+
+dataws.Range("A1:J" & lastrow).AutoFilter field:=1, Criteria1:="a"
+dataws.Range("A1:J" & lastrow).AutoFilter field:=10, Criteria1:="d"
+dataws.UsedRange.Copy Destination:=processedws.Range("A1")
+processedws.Range("I:I").NumberFormat = "yyyy-mm-dd"
+lastrowprocessed = processedws.Range("G" & Rows.Count).End(xlUp).Row
+Debug.Print lastrowprocessed
+processedws.Range("A2:A" & lastrowprocessed).Copy Destination:=finalws.Range("C2")
+processedws.Range("C2:C" & lastrowprocessed).Copy Destination:=finalws.Range("A2")
+processedws.Range("D2:D" & lastrowprocessed).Copy Destination:=finalws.Range("F2")
+processedws.Range("E2:E" & lastrowprocessed).Copy Destination:=finalws.Range("G2")
+processedws.Range("F2:F" & lastrowprocessed).Copy Destination:=finalws.Range("E2")
+processedws.Range("H2:H" & lastrowprocessed).Copy Destination:=finalws.Range("D2")
+processedws.Range("I2:I" & lastrowprocessed).Copy Destination:=finalws.Range("H2")
+processedws.Range("J2:J" & lastrowprocessed).Copy Destination:=finalws.Range("B2")
+For i = 2 To lastrowprocessed
+    finalws.Range("K" & i).Value = finalws.Range("F" & i).Value / finalws.Range("G" & i).Value
+    finalws.Range("I" & i).Value = finalws.Range("G" & i).Value * finalws.Range("K" & i).Value * _
+    VBA.IIf(finalws.Range("D" & i).Value = "xx", -1, 1)
+    
+Next i
+'=(meu*$K$1)*IF(bil="xx";-1;1)
+ActiveWorkbook.Close savechanges:=False
+
+End Sub
