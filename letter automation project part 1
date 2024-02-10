@@ -1,0 +1,110 @@
+Sub automatedword()
+
+'declaring variable to store document address
+Dim docloc As String
+'declaring variable to assign word objec and word document
+Dim WordApp, WordDoc As Object
+'declaring variable to store lastrow in consulancy templates
+Dim lastrow As Long
+'declaring variable to loop through columns
+Dim Custcol As Long
+'declaring variable to loop through rows
+Dim Custrow As Long
+'declaring variable to store TagName from the consultancy sheet
+Dim TagName As String
+'declaring variable to store respective tagvalue for each loop
+Dim TagValue As String
+'declaring variable to store FileAddress
+Dim FileName As String
+Dim fso As Object
+Dim fpath As String
+Dim location As String
+Set fso = CreateObject("Scripting.filesystemobject")
+
+
+'declaring variable to assigning consultancy sheet
+Dim templates As Worksheet
+'assigning the consultancy sheet to a variable
+Set templates = ThisWorkbook.Worksheets("Probation Extension")
+
+templates.Activate
+
+
+'assigning the lastrow to a variable
+lastrow = templates.Range("A" & Rows.Count).End(xlUp).Row
+
+
+
+'printing the last row
+Debug.Print lastrow
+
+
+'assigning the word object to a variable
+Set WordApp = CreateObject("word.Application")
+'showing the wordapp
+WordApp.Visible = True
+'assigning the templates location to a variable
+docloc = "C:\Users\vijay\Desktop\Letter Master\Letter Master\Probation Extension.docx"
+WordApp.Visible = True
+
+
+
+'looping the the rows
+On Error Resume Next
+For Custrow = 5 To lastrow
+    'assigning the word document to  variable
+    Set WordDoc = WordApp.Documents.Open(FileName:=docloc, ReadOnly:=False)
+    'looping through columns
+    For Custcol = 2 To 10
+        'assigning the respective tagname to a variable
+        TagName = Cells(4, Custcol).Value
+        'assignign the respective tagvalue to a variable
+        TagValue = Cells(Custrow, Custcol).Value
+        location = Cells(Custrow, 8).Value
+                
+        Debug.Print location
+        
+        'printing the tagvalue
+        Debug.Print TagValue
+        'finding the respective tagname inside the template
+        With WordDoc.Content.Find
+            .Text = TagName
+            .Replacement.Text = TagValue 'replacing tagname with tag value
+            .Wrap = wdFindContinue
+            .Execute Replace:=wdReplaceAll 'replacing the all tagname with the respective tagvalue
+            
+        End With
+        
+    
+
+
+    Next Custcol
+'assigning the path address to a variable where file needs to be saved
+fpath = ThisWorkbook.Path & "\" & "Letters" & "\" & "Probation Extension"
+
+
+FileName = fpath & "\" & templates.Range("B" & Custrow).Value & "_PE" & ".pdf"
+
+
+
+             
+WordDoc.ExportAsFixedFormat OutputFileName:=FileName, ExportFormat:=wdExportFormatPDF
+
+'closing the document with any changes
+WordDoc.Close savechanges:=wdDoNotSaveChanges
+
+
+
+
+
+
+'pausing the code for 4 seconds
+Application.Wait (Now + TimeValue("00:00:04"))
+
+
+Next Custrow
+
+
+
+End Sub
+
